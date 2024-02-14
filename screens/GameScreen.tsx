@@ -1,5 +1,11 @@
 import { FC, useState } from "react";
-import { View, StyleSheet, Alert, Text, FlatList } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Alert,
+  FlatList,
+  useWindowDimensions,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import TextOutlined from "../components/ui/TextOutlined";
 import ComputerGuess from "../components/game/ComputerGuess";
@@ -35,6 +41,7 @@ const GameScreen: FC<GameScreenProps> = ({ userNumber, gameOver }) => {
   const initialGuess = randomNumberComputerGuessed(1, 100, userNumber);
   const [computerGuess, setComputerGuess] = useState(initialGuess);
   const [guesses, setGuesses] = useState<number[]>([initialGuess]);
+  const { width, height } = useWindowDimensions();
 
   if (computerGuess === userNumber) {
     minGuessValue = 1;
@@ -76,11 +83,9 @@ const GameScreen: FC<GameScreenProps> = ({ userNumber, gameOver }) => {
     setGuesses((prevGuess) => [guess, ...prevGuess]);
   };
 
-  return (
-    <View style={styles.screenContainer}>
-      <TextOutlined> Opponent's Guess</TextOutlined>
+  const contentPortrait = (
+    <>
       <ComputerGuess>{computerGuess}</ComputerGuess>
-
       <Card>
         <View style={styles.labelContainer}>
           <LabelText style={styles.labelText}>Higher or Lower ? </LabelText>
@@ -102,6 +107,32 @@ const GameScreen: FC<GameScreenProps> = ({ userNumber, gameOver }) => {
           </View>
         </View>
       </Card>
+    </>
+  );
+
+  const contentLandScape = (
+    <View style={styles.landScapeContentContainer}>
+      <View style={styles.buttonContainer}>
+        <PrimaryButton onPress={allowComputerToGuess.bind(undefined, "lower")}>
+          <Ionicons name="remove" size={24} color="white" />
+        </PrimaryButton>
+      </View>
+
+      <ComputerGuess>{computerGuess}</ComputerGuess>
+      <View style={styles.buttonContainer}>
+        <PrimaryButton onPress={allowComputerToGuess.bind(undefined, "higher")}>
+          <Ionicons name="add" size={24} color="white" />
+        </PrimaryButton>
+      </View>
+    </View>
+  );
+
+  const content = width < height ? contentPortrait : contentLandScape;
+
+  return (
+    <View style={styles.screenContainer}>
+      <TextOutlined>Opponent's Guess</TextOutlined>
+      {content}
       <View style={styles.logContainer}>
         <FlatList
           data={guesses}
@@ -122,6 +153,7 @@ const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
   },
+
   text: {
     textAlign: "center",
     marginTop: 16,
@@ -149,5 +181,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 24,
     fontWeight: "700",
+  },
+  landScapeContentContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });

@@ -1,13 +1,19 @@
 import { FC, ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Colors } from "../../constants/colors";
 
 interface ComputerGuessProps {
   children: ReactNode;
 }
 const ComputerGuess: FC<ComputerGuessProps> = ({ children }) => {
+  const { width, height } = useWindowDimensions();
+
+  const padding = width < height ? 24 : 8;
+  const margin = width < height ? 0 : 32;
   return (
-    <View style={styles.displayContainer}>
+    <View
+      style={[styles.displayContainer, { padding, marginHorizontal: margin }]}
+    >
       <Text style={styles.text}>{children}</Text>
     </View>
   );
